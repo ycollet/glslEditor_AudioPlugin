@@ -366,7 +366,7 @@ Matrix3D<float> GLSLComponent::getProjectionMatrix() const
 
 Matrix3D<float> GLSLComponent::getViewMatrix() const
 {
-    Matrix3D<float> viewMatrix (Vector3D<float> (0.0f, 0.0f, -5.0f /*-10.0f*/));
+    Matrix3D<float> viewMatrix = Matrix3D<float>::fromTranslation (Vector3D<float> (0.0f, 0.0f, -5.0f /*-10.0f*/));
     Matrix3D<float> rotationMatrix = viewMatrix.rotation (Vector3D<float> (-0.3f, 5.0f * std::sin (getFrameCounter() * 0.01f), 0.0f));
 
     return /*rotationMatrix * */ viewMatrix;

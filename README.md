@@ -13,7 +13,7 @@ License : MIT
 
 [JUCE JAPAN / Outlaw Faction](http://oufac.com/ "Outlaw Faction")
 
-Require : JUCE v6.0.0
+Require : CMake 3.22+ (JUCE is fetched automatically, see Building below)
 
 ## What is this project? ##
 GLSL Editor running on VST/AU plugin host Applications Cubase, StudioOne, Ableton Live, Logic, and more...
@@ -67,35 +67,46 @@ uniform float spectrum[256]:
 
 ## Building ##
 
-So I've built under Windows and Mac OS X.
+The project uses CMake with JUCE fetched automatically via `FetchContent` — there's no
+Projucer project and no separate JUCE download/checkout needed.
 
-### Windows Build Instructions ###
+### Requirements ###
 
-1. Download Juce (http://www.juce.com/)
-2. Download the VST SDK (http://www.steinberg.net/en/company/developers.html)
-3. Run "The Projucer" executable included in Juce.
-4. Open juce project file "xxx.jucer"
-   - Make any changes to the configure and build options.
-   - Save juce project if modified
-5. Hit "Save Project and Open in Visual Studio". I use Visual Studio 2015.
-6. Select the build: "Release - x64" and set platform to x64(64bit). Otherwise, "Release - Win32" and set platform to x86(32bit).
-7. Build and deploy to plugin folder.
+* CMake 3.22 or newer
+* A C++ compiler:
+  * Windows: Visual Studio 2019 or newer
+  * macOS: Xcode (command line tools)
+* An internet connection for the first configure (CMake downloads JUCE 8.0.15 automatically)
 
-### Mac OS X Build Instructions ###
+### Build Instructions (Windows, macOS) ###
 
-1. Download Juce (http://www.juce.com/)
-2. Download the VST SDK (http://www.steinberg.net/en/company/developers.html)
-3. Run "The Projucer" executable included in Juce.
-4. Open juce project file "xxx.jucer"
-   - Make any changes to the configure and build options.
-   - Save juce project if modified
-5. Hit "Save Project and Open in Xcode". I use Xcode 7.
-6. Select the architecture x64(64bit) or x86(32bit).
-7. On default setting, When build succeed and automatically deploy to plugin directory.
+```sh
+# Configure (downloads JUCE into build/_deps on first run)
+cmake -B build
 
+# Build both the Standalone and VST3 targets, Release configuration
+cmake --build build --config Release
+```
+
+To build a single format instead of everything:
+
+```sh
+cmake --build build --target GLSLPlugIn_Standalone --config Release
+cmake --build build --target GLSLPlugIn_VST3 --config Release
+```
+
+Build products are placed under `build/GLSLPlugIn/GLSLPlugIn_artefacts/Release/`
+(`Standalone/GLSLPlugIn.app` or `.exe`, and `VST3/GLSLPlugIn.vst3`).
+
+On Windows, `cmake -B build` uses the Visual Studio generator by default, producing a
+solution you can also open and build directly in the IDE. On macOS, pass `-G Xcode`
+if you'd rather work from an Xcode project:
+
+```sh
+cmake -B build -G Xcode
+```
 
 ### Technologies Used ###
   * C++ for the language
-  * JUCE for the framework/library
-  * Steinberg VST SDK
-  * Visual Studio for the IDE
+  * JUCE (fetched via CMake `FetchContent`) for the framework/library
+  * CMake for the build system

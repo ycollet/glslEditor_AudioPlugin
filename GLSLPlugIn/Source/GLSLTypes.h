@@ -10,8 +10,10 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 #include "Resources/WavefrontObjParser.h"
+
+using namespace ::juce::gl;
 
 //==============================================================================
 struct Vertex
