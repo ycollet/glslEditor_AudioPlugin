@@ -80,6 +80,11 @@ void GLSLComponent::initialise()
     vertexShader = defaultVertexShader;
     fragmentShader = defaultFragmentShader;
 
+    // The background quad geometry never depends on the shader source, so it only
+    // needs to be (re)built when the GL context itself is (re)created - not on every
+    // shader recompile.
+    shape.reset (new Shape (openGLContext));
+
     // getShaderCacheReady() only means "some fragment text has been cached", not that
     // it was ever successfully compiled - getShaderCacheVerified() is empty until a
     // compile actually succeeds. Fall back to the known-good hardcoded default in
@@ -292,7 +297,6 @@ void GLSLComponent::createShaders()
         shader = std::move (newShader);
         shader->use();
 
-        shape.reset (new Shape (openGLContext));
         attributes.reset (new Attributes (openGLContext, *shader));
         uniforms.reset (new Uniforms (openGLContext, *shader));
 
@@ -331,7 +335,6 @@ void GLSLComponent::updateShader()
             shader = std::move (newShader);
             shader->use();
 
-            shape.reset (new Shape (openGLContext));
             attributes.reset (new Attributes (openGLContext, *shader));
             uniforms.reset (new Uniforms (openGLContext, *shader));
 
