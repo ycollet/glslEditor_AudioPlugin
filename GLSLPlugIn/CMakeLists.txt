@@ -30,8 +30,6 @@ target_sources(GLSLPlugIn
 
 target_compile_definitions(GLSLPlugIn
     PUBLIC
-        JUCE_DISPLAY_SPLASH_SCREEN=0
-        JUCE_REPORT_APP_USAGE=0
         JUCE_VST3_CAN_REPLACE_VST2=0
 )
 

@@ -31,6 +31,7 @@ public:
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
 #endif
 
+    using AudioProcessor::processBlock;
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
 
     //==============================================================================
