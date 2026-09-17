@@ -237,7 +237,7 @@ void GLSLComponent::setShaderProgramVertex (const String& _vertexShader)
 //==============================================================================
 void GLSLComponent::setMidiCCValue (int ccNumber, float value)
 {
-    if (ccNumber < 128)
+    if (ccNumber >= 0 && ccNumber < 128)
     {
         m_midiCC[ccNumber] = value;
 #ifdef DEBUG
@@ -253,7 +253,7 @@ void GLSLComponent::setMidiCCValue (int ccNumber, float value)
 
 void GLSLComponent::setSpectrumValue (int spectrumNumber, float value)
 {
-    if (spectrumNumber < 256)
+    if (spectrumNumber >= 0 && spectrumNumber < 256)
     {
         m_spectrum[spectrumNumber] = value;
     }
@@ -261,7 +261,7 @@ void GLSLComponent::setSpectrumValue (int spectrumNumber, float value)
 
 void GLSLComponent::setWaveValue (int waveNumber, float value)
 {
-    if (waveNumber < 256)
+    if (waveNumber >= 0 && waveNumber < 256)
     {
         m_wave[waveNumber] = value;
     }

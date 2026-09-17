@@ -58,11 +58,15 @@ public:
 
     void createPlayerWindow();
     void deletePlayerWindow();
-    bool existPlayerWindow() { return playerWindow != nullptr; }
+    bool existPlayerWindow() { const ScopedLock sl (playerWindowLock); return playerWindow != nullptr; }
 
 private:
     //==============================================================================
-    //ScopedPointer<PlayerWindow> playerWindow;
+    // playerWindow is created/destroyed from the message thread (via the "Player
+    // Window" button) but also read and called into from processBlock() on the
+    // audio thread, so all access to it must go through this lock - otherwise the
+    // audio thread can end up calling into a window the message thread just deleted.
+    CriticalSection playerWindowLock;
     PlayerWindow* playerWindow = nullptr;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GlslplugInAudioProcessor)
