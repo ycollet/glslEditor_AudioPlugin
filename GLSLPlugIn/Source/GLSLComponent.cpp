@@ -37,15 +37,8 @@ void main()
 })"));
 
 const String GLSLComponent::defaultFragmentShader = String (std::string (R"(
-#if JUCE_OPENGL_ES
-varying lowp vec4 destinationColour;
-varying lowp vec2 textureCoordOut;
-#else
 varying vec4 destinationColour;
 varying vec2 textureCoordOut;
-#endif
-
-#extension GL_OES_standard_derivatives : enable
 
 uniform float time;
 uniform vec2 mouse;
@@ -68,6 +61,13 @@ void main()
 //==============================================================================
 GLSLComponent::GLSLComponent()
 {
+    // Explicitly request a 3.2 core profile context instead of leaving it up to
+    // the platform/driver default. Without this, some drivers (observed with the
+    // NVIDIA Linux driver) hand out a compatibility-profile context reporting a much
+    // newer GLSL version, which confuses translateVertexShaderToV3()/
+    // translateFragmentShaderToV3() below and leads to shader link failures.
+    openGLContext.setPreferredVersion ({ 3, 2 });
+    openGLContext.setPreferredProfile (OpenGLContext::Profile::core);
 }
 
 GLSLComponent::~GLSLComponent()
@@ -80,7 +80,11 @@ void GLSLComponent::initialise()
     vertexShader = defaultVertexShader;
     fragmentShader = defaultFragmentShader;
 
-    if (StaticValues::getShaderCacheReady())
+    // getShaderCacheReady() only means "some fragment text has been cached", not that
+    // it was ever successfully compiled - getShaderCacheVerified() is empty until a
+    // compile actually succeeds. Fall back to the known-good hardcoded default in
+    // that case, rather than attempting to compile an empty fragment shader.
+    if (StaticValues::getShaderCacheReady() && StaticValues::getShaderCacheVerified().isNotEmpty())
     {
         setShaderProgramFragment (StaticValues::getShaderCacheVerified());
         updateShader();
@@ -112,11 +116,14 @@ void GLSLComponent::render()
 
     jassert (OpenGLHelpers::isContextActive());
 
-    if (shader == nullptr)
-        return;
-
+    // Retry compiling even if the previous attempt failed (shader == nullptr) -
+    // otherwise, once a single compile fails, this component can never recover,
+    // even after the user fixes/replaces the shader source.
     if (isShaderCompileReady)
         updateShader();
+
+    if (shader == nullptr)
+        return;
 
     const float desktopScale = (float) openGLContext.getRenderingScale();
     OpenGLHelpers::clear (Colour::greyLevel (0.1f));

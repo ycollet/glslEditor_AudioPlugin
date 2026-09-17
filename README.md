@@ -106,6 +106,19 @@ if you'd rather work from an Xcode project:
 cmake -B build -G Xcode
 ```
 
+### Testing shaders headlessly ###
+
+The Standalone build accepts a `-i`/`--input <file>` flag that loads a fragment
+shader from disk, compiles it exactly as if it had been pasted into the editor,
+prints `OK: ...` or `ERROR: ...` (the same message the status bar would show) to
+the console, and exits with code 0 on success or 1 on failure. This is useful for
+scripting/CI, or for diagnosing driver-specific shader compile issues without
+having to drive the GUI:
+
+```sh
+build/GLSLPlugIn/GLSLPlugIn_artefacts/Standalone/GLSLPlugIn --input examples/plasma_time.frag
+```
+
 ### Technologies Used ###
   * C++ for the language
   * JUCE (fetched via CMake `FetchContent`) for the framework/library

@@ -12,6 +12,8 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#include <iostream>
+
 //==============================================================================
 GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioProcessor& p)
     : AudioProcessorEditor (&p), processor (p), fragmentEditorComp (fragmentDocument, nullptr), forwardFFT (fftOrder), fifoIndex (0), nextFFTBlockReady (false)
@@ -66,7 +68,47 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 
     fragmentDocument.replaceAllContent (GLSLComponent::defaultFragmentShader);
 
+    checkForCommandLineInput();
+
     startTimer (shaderLinkDelay);
+}
+
+void GlslplugInAudioProcessorEditor::checkForCommandLineInput()
+{
+    const auto args = JUCEApplicationBase::getCommandLineParameterArray();
+    String inputPath;
+
+    for (int i = 0; i < args.size(); ++i)
+    {
+        if (args[i] == "-i" || args[i] == "--input")
+        {
+            if (i + 1 < args.size())
+                inputPath = args[i + 1];
+
+            break;
+        }
+    }
+
+    if (inputPath.isEmpty())
+        return;
+
+    File shaderFile (inputPath);
+
+    if (! shaderFile.existsAsFile())
+    {
+        std::cerr << "error: cannot read shader file: " << inputPath << std::endl;
+
+        if (auto* app = JUCEApplicationBase::getInstance())
+        {
+            app->setApplicationReturnValue (1);
+            JUCEApplicationBase::quit();
+        }
+
+        return;
+    }
+
+    commandLineInputSource = shaderFile.loadFileAsString();
+    commandLineInputPending = true;
 }
 
 GlslplugInAudioProcessorEditor::~GlslplugInAudioProcessorEditor()
@@ -146,6 +188,13 @@ void GlslplugInAudioProcessorEditor::resized()
 //==============================================================================
 void GlslplugInAudioProcessorEditor::timerCallback()
 {
+    if (commandLineInputPending && m_GLSLCompo.isInitialised)
+    {
+        commandLineInputPending = false;
+        commandLineInputAwaitingResult = true;
+        fragmentDocument.replaceAllContent (commandLineInputSource);
+    }
+
     if (isNeedShaderCompile)
     {
         isNeedShaderCompile = false;
@@ -161,6 +210,23 @@ void GlslplugInAudioProcessorEditor::timerCallback()
             setShaderSync();
 
         startTimer (20);
+    }
+
+    if (commandLineInputAwaitingResult
+        && m_GLSLCompo.isInitialised
+        && ! isNeedShaderCompile
+        && ! m_GLSLCompo.isShaderCompileReady)
+    {
+        commandLineInputAwaitingResult = false;
+
+        const bool success = m_GLSLCompo.isShaderCompileSuccess;
+        std::cout << (success ? "OK: " : "ERROR: ") << m_statusLabel.getText() << std::endl;
+
+        if (auto* app = JUCEApplicationBase::getInstance())
+        {
+            app->setApplicationReturnValue (success ? 0 : 1);
+            JUCEApplicationBase::quit();
+        }
     }
 
     // MIDI CC

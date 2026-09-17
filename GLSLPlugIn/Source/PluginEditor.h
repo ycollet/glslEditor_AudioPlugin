@@ -86,6 +86,15 @@ private:
     bool isShaderSyncAuto = false;
     bool isNeedShaderCompile = false;
 
+    // -i/--input command line support: loads a fragment shader from disk, compiles
+    // it the same way a pasted-in shader would be, prints the result to the
+    // console, and quits with a 0 (success) or 1 (failure) exit code. Intended for
+    // headless/scripted testing of shader files without driving the GUI.
+    void checkForCommandLineInput();
+    String commandLineInputSource;
+    bool commandLineInputPending = false;
+    bool commandLineInputAwaitingResult = false;
+
     int wndFullSizeW = 1024;
     int wndFullSizeH = 576;
 
