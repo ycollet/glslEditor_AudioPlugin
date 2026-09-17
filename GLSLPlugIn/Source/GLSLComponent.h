@@ -24,7 +24,7 @@ class GLSLComponent : public OpenGLAppComponent,
 public:
     //==============================================================================
     GLSLComponent();
-    ~GLSLComponent();
+    ~GLSLComponent() override;
 
     //==============================================================================
     void initialise() override;
@@ -40,7 +40,7 @@ public:
     void setFragmentDocPtr (CodeDocument* _fragmentDoc);
 
     //==============================================================================
-    void setShaderProgram (const String& vertexShader, const String& fragmentShader);
+    void setShaderProgram (const String& _vertexShader, const String& _fragmentShader);
     void setShaderProgramFragment (const String& _fragmentShader);
     void setShaderProgramVertex (const String& _vertexShader);
 

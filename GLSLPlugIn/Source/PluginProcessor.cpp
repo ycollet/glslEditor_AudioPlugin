@@ -84,21 +84,21 @@ int GlslplugInAudioProcessor::getCurrentProgram()
     return 0;
 }
 
-void GlslplugInAudioProcessor::setCurrentProgram (int index)
+void GlslplugInAudioProcessor::setCurrentProgram (int)
 {
 }
 
-const String GlslplugInAudioProcessor::getProgramName (int index)
+const String GlslplugInAudioProcessor::getProgramName (int)
 {
     return String();
 }
 
-void GlslplugInAudioProcessor::changeProgramName (int index, const String& newName)
+void GlslplugInAudioProcessor::changeProgramName (int, const String&)
 {
 }
 
 //==============================================================================
-void GlslplugInAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void GlslplugInAudioProcessor::prepareToPlay (double, int)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
@@ -139,11 +139,11 @@ void GlslplugInAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuff
     auto editor = static_cast<GlslplugInAudioProcessorEditor*> (getActiveEditor());
 
     ///////////////////////////////////////////////////////////
-    int time;
-    MidiMessage m;
-
-    for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
+    for (const auto metadata : midiMessages)
     {
+        const auto m = metadata.getMessage();
+
+
         if (m.isNoteOn())
         {
         }

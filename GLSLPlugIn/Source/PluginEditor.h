@@ -25,9 +25,11 @@ class GlslplugInAudioProcessorEditor : public AudioProcessorEditor,
 {
 public:
     GlslplugInAudioProcessorEditor (GlslplugInAudioProcessor&);
-    ~GlslplugInAudioProcessorEditor();
+    ~GlslplugInAudioProcessorEditor() override;
 
     //==============================================================================
+    using Component::keyPressed;
+
     void paint (Graphics&) override;
     void resized() override;
     void timerCallback() override;
@@ -35,7 +37,7 @@ public:
     void setShaderSync();
     void pushNextSampleIntoFifo (float sample) noexcept;
 
-    GlslplugInAudioProcessor& processor;
+    GlslplugInAudioProcessor& audioProcessor;
 
 private:
     // This reference is provided as a quick way for your editor to
@@ -77,8 +79,7 @@ private:
     float waveData[fftSize];
 
     // KeyListener
-    //bool keyPressed(const KeyPress& key) override;
-    bool keyPressed (const KeyPress& key, Component* originatingComponent) override;
+    bool keyPressed (const KeyPress& key, Component*) override;
 
     /** Called when the button is clicked. */
     virtual void buttonClicked (Button*) override;

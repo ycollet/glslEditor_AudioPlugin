@@ -131,7 +131,7 @@ void GLSLComponent::render()
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glViewport (0, 0, roundToInt (desktopScale * getWidth()), roundToInt (desktopScale * getHeight()));
+    glViewport (0, 0, roundToInt (desktopScale * (float) getWidth()), roundToInt (desktopScale * (float) getHeight()));
 
     shader->use();
 
@@ -152,7 +152,7 @@ void GLSLComponent::render()
 
     if (uniforms->resolution != nullptr)
     {
-        uniforms->resolution->set (getWidth(), getHeight());
+        uniforms->resolution->set ((float) getWidth(), (float) getHeight());
     }
 
     if (uniforms->mouse != nullptr)
@@ -189,7 +189,7 @@ void GLSLComponent::render()
     /**/
 }
 
-void GLSLComponent::paint (Graphics& g)
+void GLSLComponent::paint (Graphics&)
 {
     // You can add your component specific drawing code here!
     // This will draw over the top of the openGL background.
@@ -213,10 +213,10 @@ void GLSLComponent::setFragmentDocPtr (CodeDocument* _fragmentDoc)
 }
 
 //==============================================================================
-void GLSLComponent::setShaderProgram (const String& vertexShader, const String& fragmentShader)
+void GLSLComponent::setShaderProgram (const String& _vertexShader, const String& _fragmentShader)
 {
-    newVertexShader = vertexShader;
-    newFragmentShader = fragmentShader;
+    newVertexShader = _vertexShader;
+    newFragmentShader = _fragmentShader;
     isShaderCompileReady = true;
 }
 
@@ -357,8 +357,8 @@ void GLSLComponent::updateShader()
 
 void GLSLComponent::mouseDrag (const MouseEvent& event)
 {
-    mouseX = float (event.getPosition().getX()) / getWidth();
-    mouseY = 1.0f - float (event.getPosition().getY()) / getHeight();
+    mouseX = float (event.getPosition().getX()) / (float) getWidth();
+    mouseY = 1.0f - float (event.getPosition().getY()) / (float) getHeight();
 
     mouseX = std::min (std::max (0.0f, mouseX), 1.0f);
     mouseY = std::min (std::max (0.0f, mouseY), 1.0f);
@@ -374,7 +374,6 @@ Matrix3D<float> GLSLComponent::getProjectionMatrix() const
 Matrix3D<float> GLSLComponent::getViewMatrix() const
 {
     Matrix3D<float> viewMatrix = Matrix3D<float>::fromTranslation (Vector3D<float> (0.0f, 0.0f, -5.0f /*-10.0f*/));
-    Matrix3D<float> rotationMatrix = viewMatrix.rotation (Vector3D<float> (-0.3f, 5.0f * std::sin (getFrameCounter() * 0.01f), 0.0f));
 
-    return /*rotationMatrix * */ viewMatrix;
+    return viewMatrix;
 }

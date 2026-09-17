@@ -21,7 +21,7 @@ class GlslplugInAudioProcessor : public AudioProcessor
 public:
     //==============================================================================
     GlslplugInAudioProcessor();
-    ~GlslplugInAudioProcessor();
+    ~GlslplugInAudioProcessor() override;
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -57,7 +57,7 @@ public:
 
     void createPlayerWindow();
     void deletePlayerWindow();
-    bool existPlayerWindow() { return playerWindow != nullptr; };
+    bool existPlayerWindow() { return playerWindow != nullptr; }
 
 private:
     //==============================================================================

@@ -16,7 +16,7 @@
 
 //==============================================================================
 GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioProcessor& p)
-    : AudioProcessorEditor (&p), processor (p), fragmentEditorComp (fragmentDocument, nullptr), forwardFFT (fftOrder), fifoIndex (0), nextFFTBlockReady (false)
+    : AudioProcessorEditor (&p), audioProcessor (p), fragmentEditorComp (fragmentDocument, nullptr), forwardFFT (fftOrder), fifoIndex (0), nextFFTBlockReady (false)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -41,7 +41,7 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
     m_statusLabel.setJustificationType (Justification::topLeft);
     m_statusLabel.setColour (Label::backgroundColourId, windowBackground);
     m_statusLabel.setColour (Label::textColourId, windowForeground);
-    m_statusLabel.setFont (Font (14.0f));
+    m_statusLabel.setFont (Font (FontOptions().withHeight (14.0f)));
     addAndMakeVisible (m_statusLabel);
 
     m_SyncModeSwitch.setToggleState (false, dontSendNotification);
@@ -125,7 +125,7 @@ void GlslplugInAudioProcessorEditor::paint (Graphics& g)
 void GlslplugInAudioProcessorEditor::resized()
 {
     Rectangle<int> area (getLocalBounds().reduced (4));
-    Rectangle<int> bottom (area.removeFromBottom (75));
+    area.removeFromBottom (75);
 
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
@@ -281,7 +281,7 @@ void GlslplugInAudioProcessorEditor::sendMidiCCValue()
         juce::MidiMessage midiCC = m_midiCCqueue.front();
         m_midiCCqueue.pop();
         if (m_GLSLCompo.isInitialised)
-            m_GLSLCompo.setMidiCCValue (midiCC.getControllerNumber(), midiCC.getControllerValue());
+            m_GLSLCompo.setMidiCCValue (midiCC.getControllerNumber(), (float) midiCC.getControllerValue());
     }
 }
 
@@ -340,7 +340,7 @@ void GlslplugInAudioProcessorEditor::sendNextWave()
     }
 }
 
-bool GlslplugInAudioProcessorEditor::keyPressed (const KeyPress& key, Component* originatingComponent)
+bool GlslplugInAudioProcessorEditor::keyPressed (const KeyPress& key, Component*)
 {
     //m_statusLabel.setText(m_statusLabel.getText() + "keyCode:" + String(key.getKeyCode()) + "/keyChar:" + String(key.getTextCharacter()), dontSendNotification);
 
@@ -381,7 +381,7 @@ bool GlslplugInAudioProcessorEditor::keyPressed (const KeyPress& key, Component*
             auto fs = fragmentEditorComp.getFont();
             if (fs.getHeight() < 52)
             {
-                fragmentEditorComp.setFont (Font (fs.getHeight() + 1.0f));
+                fragmentEditorComp.setFont (Font (FontOptions().withHeight (fs.getHeight() + 1.0f)));
             }
         }
         if (key.getKeyCode() == 45) // "-"
@@ -389,7 +389,7 @@ bool GlslplugInAudioProcessorEditor::keyPressed (const KeyPress& key, Component*
             auto fs = fragmentEditorComp.getFont();
             if (fs.getHeight() > 7)
             {
-                fragmentEditorComp.setFont (Font (fs.getHeight() - 1.0f));
+                fragmentEditorComp.setFont (Font (FontOptions().withHeight (fs.getHeight() - 1.0f)));
             }
         }
     }
@@ -409,9 +409,9 @@ void GlslplugInAudioProcessorEditor::buttonClicked (Button* _button)
     }
     if (_button->getName() == "PLAY_WND")
     {
-        if (processor.existPlayerWindow())
-            processor.deletePlayerWindow();
+        if (audioProcessor.existPlayerWindow())
+            audioProcessor.deletePlayerWindow();
         else
-            processor.createPlayerWindow();
+            audioProcessor.createPlayerWindow();
     }
 }
