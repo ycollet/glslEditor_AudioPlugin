@@ -65,6 +65,20 @@ uniform float spectrum[256]:
  The range of values ​​stored in each array is roughly 0 to 1, depending on the DAW.
  ~~~
 
+## Keyboard Shortcuts ##
+
+The plugin window is resizable (drag any corner/edge) so you can give the code
+editor more room for long shader lines. In addition:
+
+| Shortcut | Effect |
+|---|---|
+| Ctrl + K | Toggle "Preview Only" (fullscreen GLSL render, hides the code editor) |
+| Ctrl + P | Toggle "Editor Only" (fullscreen code editor, hides the GLSL preview) |
+| Ctrl + `+` (or `;`) | Increase the code editor's font size |
+| Ctrl + `-` | Decrease the code editor's font size |
+
+Note: this is the Ctrl key specifically, even on macOS (not Cmd).
+
 ## Building ##
 
 The project uses CMake with JUCE fetched automatically via `FetchContent` — there's no

@@ -21,6 +21,8 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (wndFullSizeW, wndFullSizeH);
+    setResizable (true, true);
+    setResizeLimits (400, 300, 3840, 2160);
     getTopLevelComponent()->addKeyListener (this);
 
     m_GLSLCompo.setStatusLabelPtr (&m_statusLabel);
@@ -124,21 +126,21 @@ void GlslplugInAudioProcessorEditor::paint (Graphics& g)
 
 void GlslplugInAudioProcessorEditor::resized()
 {
-    Rectangle<int> area (getLocalBounds().reduced (4));
-    area.removeFromBottom (75);
-
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
-    int glSide = wndFullSizeH;
-    int glBottom = wndFullSizeH;
-    m_GLSLCompo.setBounds (0, 0, glSide, glBottom);
-
-    int editorBottom = wndFullSizeH - 80;
-    int editorSide = wndFullSizeW - wndFullSizeH;
+    // Lay out from the editor's *current* size (rather than the fixed
+    // wndFullSizeW/H constants) so the window can actually be resized -
+    // dragging the corner, or a host resizing us, ends up here too.
+    const int width = getWidth();
+    const int height = getHeight();
 
     switch (m_guiState)
     {
         case GUIState::Default:
+        {
+            const int glSide = height;
+            const int editorBottom = height - 80;
+            const int editorSide = width - glSide;
+
+            m_GLSLCompo.setBounds (0, 0, glSide, height);
             fragmentEditorComp.setBounds (glSide, 0, editorSide, editorBottom);
             m_statusLabel.setBounds (glSide, editorBottom, editorSide, 60);
             m_SyncModeSwitch.setBounds (glSide, editorBottom + 60, 108, 20);
@@ -150,37 +152,35 @@ void GlslplugInAudioProcessorEditor::resized()
             m_SyncButton.setVisible (true);
             m_PlayWndButton.setVisible (true);
             m_statusLabel.setVisible (true);
-            this->setSize (wndFullSizeW, wndFullSizeH);
             break;
+        }
 
         case GUIState::EditorOnly:
-            fragmentEditorComp.setBounds (0, 0, wndFullSizeW, editorBottom);
-            m_statusLabel.setBounds (0, editorBottom, wndFullSizeW, 60);
-            m_SyncModeSwitch.setBounds (glSide, editorBottom + 60, 108, 20);
-            m_SyncButton.setBounds (glSide + 108, editorBottom + 60, 170, 20);
-            m_PlayWndButton.setBounds (glSide + 278, editorBottom + 60, 170, 20);
+        {
+            const int editorBottom = height - 80;
+
+            fragmentEditorComp.setBounds (0, 0, width, editorBottom);
+            m_statusLabel.setBounds (0, editorBottom, width, 60);
+            m_SyncModeSwitch.setBounds (0, editorBottom + 60, 108, 20);
+            m_SyncButton.setBounds (108, editorBottom + 60, 170, 20);
+            m_PlayWndButton.setBounds (278, editorBottom + 60, 170, 20);
             m_GLSLCompo.setVisible (false);
             fragmentEditorComp.setVisible (true);
             m_SyncModeSwitch.setVisible (true);
             m_SyncButton.setVisible (true);
             m_PlayWndButton.setVisible (true);
             m_statusLabel.setVisible (true);
-            this->setSize (wndFullSizeW, wndFullSizeH);
             break;
+        }
 
         case GUIState::PreviewOnly:
-            fragmentEditorComp.setBounds (glSide, 0, editorSide, editorBottom);
-            m_statusLabel.setBounds (glSide, editorBottom, editorSide, 60);
-            m_SyncModeSwitch.setBounds (glSide, editorBottom + 60, 108, 20);
-            m_SyncButton.setBounds (glSide + 108, editorBottom + 60, 170, 20);
-            m_PlayWndButton.setBounds (glSide + 278, editorBottom + 60, 170, 20);
+            m_GLSLCompo.setBounds (0, 0, width, height);
             m_GLSLCompo.setVisible (true);
             fragmentEditorComp.setVisible (false);
             m_SyncModeSwitch.setVisible (false);
             m_SyncButton.setVisible (false);
             m_PlayWndButton.setVisible (false);
             m_statusLabel.setVisible (false);
-            this->setSize (glSide, glBottom);
             break;
     }
 }
@@ -352,11 +352,13 @@ bool GlslplugInAudioProcessorEditor::keyPressed (const KeyPress& key, Component*
             {
                 case GUIState::Default:
                     m_guiState = GUIState::PreviewOnly;
+                    setSize (wndFullSizeH, wndFullSizeH);
                     break;
                 case GUIState::EditorOnly:
                     break;
                 case GUIState::PreviewOnly:
                     m_guiState = GUIState::Default;
+                    setSize (wndFullSizeW, wndFullSizeH);
                     break;
             }
             this->resized();
@@ -367,9 +369,11 @@ bool GlslplugInAudioProcessorEditor::keyPressed (const KeyPress& key, Component*
             {
                 case GUIState::Default:
                     m_guiState = GUIState::EditorOnly;
+                    setSize (wndFullSizeW, wndFullSizeH);
                     break;
                 case GUIState::EditorOnly:
                     m_guiState = GUIState::Default;
+                    setSize (wndFullSizeW, wndFullSizeH);
                     break;
                 case GUIState::PreviewOnly:
                     break;
