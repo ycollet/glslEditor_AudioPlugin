@@ -254,12 +254,19 @@ void GlslplugInAudioProcessorEditor::codeDocumentTextInserted (const String& /*n
 {
     startTimer (shaderLinkDelay);
     isNeedShaderCompile = true;
+
+    // CodeEditorComponent's incremental repaint can leave stale glyphs on screen
+    // when a line shrinks (e.g. after a bulk replaceAllContent with shorter text),
+    // since it only invalidates the region covered by the new content. Force a
+    // full repaint so nothing from the previous content lingers.
+    fragmentEditorComp.repaint();
 }
 
 void GlslplugInAudioProcessorEditor::codeDocumentTextDeleted (int /*startIndex*/, int /*endIndex*/)
 {
     startTimer (shaderLinkDelay);
     isNeedShaderCompile = true;
+    fragmentEditorComp.repaint();
 }
 
 void GlslplugInAudioProcessorEditor::setMidiCCValue (juce::MidiMessage midiCC)
