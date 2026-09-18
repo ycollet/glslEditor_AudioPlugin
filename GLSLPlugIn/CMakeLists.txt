@@ -58,3 +58,10 @@ target_link_libraries(GLSLPlugIn
 )
 
 juce_generate_juce_header(GLSLPlugIn)
+
+# Adds a GLSLPlugIn_CLAP target alongside the Standalone/VST3 ones, using the
+# same CLAP_ID/company identity as the other formats' BUNDLE_ID.
+clap_juce_extensions_plugin(TARGET GLSLPlugIn
+    CLAP_ID "com.JuceJapan.GLSLPlugIn"
+    CLAP_FEATURES "audio-effect" "analyzer"
+)

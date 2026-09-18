@@ -28,6 +28,7 @@ This demo movie has copy and paste the glsl codes from "GLSL Sandbox Gallery".
 + VST
 + VST3
 + AudioUnit
++ CLAP
 + Stand-alone executable
 
 ## Usage / uniform variables
@@ -95,10 +96,10 @@ Projucer project and no separate JUCE download/checkout needed.
 ### Build Instructions (Windows, macOS) ###
 
 ```sh
-# Configure (downloads JUCE into build/_deps on first run)
+# Configure (downloads JUCE and clap-juce-extensions into build/_deps on first run)
 cmake -B build
 
-# Build both the Standalone and VST3 targets, Release configuration
+# Build the Standalone, VST3, and CLAP targets, Release configuration
 cmake --build build --config Release
 ```
 
@@ -107,10 +108,14 @@ To build a single format instead of everything:
 ```sh
 cmake --build build --target GLSLPlugIn_Standalone --config Release
 cmake --build build --target GLSLPlugIn_VST3 --config Release
+cmake --build build --target GLSLPlugIn_CLAP --config Release
 ```
 
 Build products are placed under `build/GLSLPlugIn/GLSLPlugIn_artefacts/Release/`
-(`Standalone/GLSLPlugIn.app` or `.exe`, and `VST3/GLSLPlugIn.vst3`).
+(`Standalone/GLSLPlugIn.app` or `.exe`, `VST3/GLSLPlugIn.vst3`, and `CLAP/GLSLPlugIn.clap`).
+
+CLAP support comes from the third-party [clap-juce-extensions](https://github.com/free-audio/clap-juce-extensions)
+project (JUCE itself has no native CLAP format) - it's fetched automatically alongside JUCE, no extra setup needed.
 
 On Windows, `cmake -B build` uses the Visual Studio generator by default, producing a
 solution you can also open and build directly in the IDE. On macOS, pass `-G Xcode`
